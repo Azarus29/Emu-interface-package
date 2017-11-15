@@ -37,7 +37,6 @@ angular.module('testApp')
 						res = evt.currentTarget.result;
 					}
 					Wavparserservice.parseWavAudioBuf(res).then(function (audioBuffer) {
-						console.log("Audio Buffer : "+audioBuffer);
 						sServObj.setAudioBuffer(audioBuffer);
 					}, function (errMess){
 						console.log("Erreur " + errMess);						

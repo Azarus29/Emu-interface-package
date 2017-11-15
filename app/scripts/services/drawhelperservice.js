@@ -514,6 +514,75 @@ angular.module('testApp')
 
 
 		/**
+		 * drawing method to drawMovingBoundaryLine
+		 */
+
+		sServObj.drawMovingBoundaryLine = function (ctx) {
+
+			var xOffset, sDist;
+			sDist = sServObj.getSampleDist(ctx.canvas.width);
+
+			// calc. offset dependant on type of level of mousemove  -> default is sample exact
+			xOffset = (sDist / 2);
+
+			if (false) {
+				ctx.fillStyle = "#0000FF";
+				var p = Math.round(sServObj.getPos(ctx.canvas.width, viewState.movingBoundarySample));
+				if (viewState.getcurMouseisLast()) {
+					ctx.fillRect(p + sDist, 0, 1, ctx.canvas.height);
+				} else {
+					ctx.fillRect(p + xOffset, 0, 1, ctx.canvas.height);
+				}
+			}
+
+		};
+
+		/**
+		 * drawing method to drawMinMaxAndName
+		 * @param ctx is context to be drawn on
+		 * @param trackName name of track to be drawn in the center of the canvas (left aligned)
+		 * @param min value to be drawn at the bottom of the canvas (left aligned)
+		 * @param max value to be drawn at the top of the canvas (left aligned)
+		 * @param round value to round to for min/max values (== digits after comma)
+		 */
+		sServObj.drawMinMaxAndName = function (ctx, trackName, min, max, round) {
+			// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.strokeStyle = "#000000";
+			ctx.fillStyle = "#000000";
+
+			/*var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
+
+			// var scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
+			var scaleY = ctx.canvas.height / ctx.canvas.offsetHeight;
+
+			var smallFontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 3 / 4;
+			var th = smallFontSize * scaleY;*/
+
+			// draw corner pointers
+			ctx.beginPath();
+			ctx.moveTo(0, 0);
+			ctx.lineTo(5, 5);
+			ctx.moveTo(0, ctx.canvas.height);
+			ctx.lineTo(5, ctx.canvas.height - 5);
+			ctx.stroke();
+			ctx.closePath();
+
+			// draw trackName
+			/*if (trackName !== '') {
+				fontScaleService.drawUndistortedText(ctx, trackName, fontSize, ConfigProviderService.design.font.small.family, 0, ctx.canvas.height / 2 - fontSize * scaleY / 2, ConfigProviderService.design.color.black, true);
+			}
+
+			// draw min/max vals
+			if (max !== undefined) {
+				fontScaleService.drawUndistortedText(ctx, 'max: ' + mathHelperService.roundToNdigitsAfterDecPoint(max, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, 5, ConfigProviderService.design.color.grey, true);
+			}
+			// draw min/max vals
+			if (min !== undefined) {
+				fontScaleService.drawUndistortedText(ctx, 'min: ' + mathHelperService.roundToNdigitsAfterDecPoint(min, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, ctx.canvas.height - th - 5, ConfigProviderService.design.color.grey, true);
+			}*/
+		};
+
+		/**
 		 * drawing method to drawCurViewPortSelected
 		 */
 		sServObj.drawCurViewPortSelected = function (ctx, drawTimeAndSamples) {
@@ -523,25 +592,25 @@ angular.module('testApp')
 			sDist = sServObj.getSampleDist(ctx.canvas.width);
 			xOffset = 0;
 
-			var posS = viewState.getPos(ctx.canvas.width, viewState.curViewPort.selectS);
-			var posE = viewState.getPos(ctx.canvas.width, viewState.curViewPort.selectE);
+			var posS = sServObj.getPos(ctx.canvas.width, 0);
+			var posE = sServObj.getPos(ctx.canvas.width, fileService.audioBuffer.length);
 
 			if (posS === posE) {
 
-				ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+				ctx.fillStyle = 'rgba(0, 0, 0, 255)';
 				ctx.fillRect(posS + xOffset, 0, 2, ctx.canvas.height);
 
 				if (drawTimeAndSamples) {
-					if (viewState.curViewPort.sS !== viewState.curViewPort.selectS && viewState.curViewPort.selectS !== -1) {
+					/*if (viewState.curViewPort.sS !== viewState.curViewPort.selectS && viewState.curViewPort.selectS !== -1) {
 						scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
 						space = getScaleWidth(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), scaleX);
 						fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
-					}
+					}*/
 				}
 			} else {
-				ctx.fillStyle = 'rgba(150, 150, 150, 0.5)';
+				ctx.fillStyle = 'rgba(150, 150, 150, 255)';
 				ctx.fillRect(posS, 0, posE - posS, ctx.canvas.height);
-				ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+				ctx.fillStyle = 'rgba(0, 0, 0, 255)';
 				ctx.beginPath();
 				ctx.moveTo(posS, 0);
 				ctx.lineTo(posS, ctx.canvas.height);
@@ -553,18 +622,18 @@ angular.module('testApp')
 				if (drawTimeAndSamples) {
 					// start values
 					scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
-					space = getScaleWidth(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), scaleX);
-					fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posS - space - 5, 0, ConfigProviderService.design.color.black, false);
+					space = getScaleWidth(ctx, 0, mathHelperService.roundToNdigitsAfterDecPoint(0 / fileService.audioBuffer.sampleRate, 6), scaleX);
+					//fontScaleService.drawUndistortedTextTwoLines(ctx, 0, mathHelperService.roundToNdigitsAfterDecPoint(0/ fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posS - space - 5, 0, "#000000", false);
 
 					// end values
-					fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectE, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectE / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
+					//fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectE, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectE / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
 					// dur values
 					// check if space
-					space = getScale(ctx, mathHelperService.roundToNdigitsAfterDecPoint((viewState.curViewPort.selectE - viewState.curViewPort.selectS) / fileService.audioBuffer.sampleRate, 6), scaleX);
+					space = getScale(ctx, mathHelperService.roundToNdigitsAfterDecPoint((fileService.audioBuffer.length - 0) / fileService.audioBuffer.sampleRate, 6), scaleX);
 
 					if (posE - posS > space) {
-						var str1 = viewState.curViewPort.selectE - viewState.curViewPort.selectS - 1;
-						var str2 = mathHelperService.roundToNdigitsAfterDecPoint(((viewState.curViewPort.selectE - viewState.curViewPort.selectS) / fileService.audioBuffer.sampleRate), 6);
+						var str1 = fileService.audioBuffer.length - 0 - 1;
+						var str2 = mathHelperService.roundToNdigitsAfterDecPoint(((fileService.audioBuffer.length - 0) / fileService.audioBuffer.sampleRate), 6);
 						space = getScaleWidth(ctx, str1, str2, scaleX);
 						//fontScaleService.drawUndistortedTextTwoLines(ctx, str1, str2, fontSize, ConfigProviderService.design.font.small.family, posS + (posE - posS) / 2 - space / 2, 0, '#000000', false);
 					}
@@ -590,60 +659,14 @@ angular.module('testApp')
         };
 
 		/**
-		 * drawing method to drawMinMaxAndName
-		 * @param ctx is context to be drawn on
-		 * @param trackName name of track to be drawn in the center of the canvas (left aligned)
-		 * @param min value to be drawn at the bottom of the canvas (left aligned)
-		 * @param max value to be drawn at the top of the canvas (left aligned)
-		 * @param round value to round to for min/max values (== digits after comma)
-		 */
-
-		/*sServObj.drawMinMaxAndName = function (ctx, trackName, min, max, round) {
-			// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-			ctx.strokeStyle = '#000000';
-			ctx.fillStyle = '#000000';
-
-			var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
-
-			// var scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
-			var scaleY = ctx.canvas.height / ctx.canvas.offsetHeight;
-
-			var smallFontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 3 / 4;
-			var th = smallFontSize * scaleY;
-
-			// draw corner pointers
-			ctx.beginPath();
-			ctx.moveTo(0, 0);
-			ctx.lineTo(5, 5);
-			ctx.moveTo(0, ctx.canvas.height);
-			ctx.lineTo(5, ctx.canvas.height - 5);
-			ctx.stroke();
-			ctx.closePath();
-
-			// draw trackName
-			if (trackName !== '') {
-				fontScaleService.drawUndistortedText(ctx, trackName, fontSize, ConfigProviderService.design.font.small.family, 0, ctx.canvas.height / 2 - fontSize * scaleY / 2, ConfigProviderService.design.color.black, true);
-			}
-
-			// draw min/max vals
-			if (max !== undefined) {
-				fontScaleService.drawUndistortedText(ctx, 'max: ' + mathHelperService.roundToNdigitsAfterDecPoint(max, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, 5, ConfigProviderService.design.color.grey, true);
-			}
-			// draw min/max vals
-			if (min !== undefined) {
-				fontScaleService.drawUndistortedText(ctx, 'min: ' + mathHelperService.roundToNdigitsAfterDecPoint(min, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, ctx.canvas.height - th - 5, ConfigProviderService.design.color.grey, true);
-			}
-		};*/
-
-		/**
 		 *
 		 */
-		/*sServObj.drawViewPortTimes = function (ctx) {
-			ctx.strokeStyle = ConfigProviderService.design.color.black;
-			ctx.fillStyle = ConfigProviderService.design.color.black;
-			ctx.font = (ConfigProviderService.design.font.small.size + ' ' + ConfigProviderService.design.font.small.family);
+		sServObj.drawViewPortTimes = function (ctx) {
+			ctx.strokeStyle = "#000000";
+			ctx.fillStyle = "#000000";
+			//ctx.font = (ConfigProviderService.design.font.small.size + ' ' + ConfigProviderService.design.font.small.family);
 
-			var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
+			//var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
 
 			// lines to corners
 			ctx.beginPath();
@@ -659,12 +682,12 @@ angular.module('testApp')
 			var space;
 			if (viewState.curViewPort) {
 				//draw time and sample nr
-				sTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.sS / fileService.audioBuffer.sampleRate, 6);
-				eTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.eS / fileService.audioBuffer.sampleRate, 6);
-				fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.sS, sTime, fontSize, ConfigProviderService.design.font.small.family, 5, 0, ConfigProviderService.design.color.black, true);
-				space = getScaleWidth(ctx, viewState.curViewPort.eS, eTime, scaleX);
-				fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.eS, eTime, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - space - 5, 0, ConfigProviderService.design.color.black, false);
+				sTime = mathHelperService.roundToNdigitsAfterDecPoint(0 / fileService.audioBuffer.sampleRate, 6);
+				eTime = mathHelperService.roundToNdigitsAfterDecPoint(fileService.audioBuffer.length / fileService.audioBuffer.sampleRate, 6);
+				//fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.sS, sTime, fontSize, ConfigProviderService.design.font.small.family, 5, 0, ConfigProviderService.design.color.black, true);
+				space = getScaleWidth(ctx, fileService.audioBuffer.length, eTime, scaleX);
+				//fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.eS, eTime, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - space - 5, 0, ConfigProviderService.design.color.black, false);
 			}
-		};*/
+		};
 		return sServObj;
 	});
