@@ -525,7 +525,7 @@ angular.module('testApp')
 			// calc. offset dependant on type of level of mousemove  -> default is sample exact
 			xOffset = (sDist / 2);
 
-			if (false) {
+			/*if (viewState.movingBoundary) {
 				ctx.fillStyle = "#0000FF";
 				var p = Math.round(sServObj.getPos(ctx.canvas.width, viewState.movingBoundarySample));
 				if (viewState.getcurMouseisLast()) {
@@ -533,7 +533,7 @@ angular.module('testApp')
 				} else {
 					ctx.fillRect(p + xOffset, 0, 1, ctx.canvas.height);
 				}
-			}
+			}*/
 
 		};
 
@@ -592,25 +592,26 @@ angular.module('testApp')
 			sDist = sServObj.getSampleDist(ctx.canvas.width);
 			xOffset = 0;
 
-			var posS = sServObj.getPos(ctx.canvas.width, 0);
-			var posE = sServObj.getPos(ctx.canvas.width, fileService.audioBuffer.length);
-
+			//pos start/end to change if needing to draw only a part of the signal
+			var posS = sServObj.getPos(ctx.canvas.width, 0); //viewState.curViewPort.selectS
+			var posE = sServObj.getPos(ctx.canvas.width, fileService.audioBuffer.length); //viewState.curViewPort.selectE
 			if (posS === posE) {
 
 				ctx.fillStyle = 'rgba(0, 0, 0, 255)';
 				ctx.fillRect(posS + xOffset, 0, 2, ctx.canvas.height);
 
-				if (drawTimeAndSamples) {
-					/*if (viewState.curViewPort.sS !== viewState.curViewPort.selectS && viewState.curViewPort.selectS !== -1) {
+				/*if (drawTimeAndSamples) {
+					if (viewState.curViewPort.sS !== viewState.curViewPort.selectS && viewState.curViewPort.selectS !== -1) {
 						scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
 						space = getScaleWidth(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), scaleX);
 						fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
-					}*/
-				}
+					}
+				}*/
+
 			} else {
-				ctx.fillStyle = 'rgba(150, 150, 150, 255)';
+				ctx.fillStyle = 'rgba(150, 150, 150, 0.5)';
 				ctx.fillRect(posS, 0, posE - posS, ctx.canvas.height);
-				ctx.fillStyle = 'rgba(0, 0, 0, 255)';
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
 				ctx.beginPath();
 				ctx.moveTo(posS, 0);
 				ctx.lineTo(posS, ctx.canvas.height);
@@ -619,7 +620,7 @@ angular.module('testApp')
 				ctx.closePath();
 				ctx.stroke();
 
-				if (drawTimeAndSamples) {
+				/*if (drawTimeAndSamples) {
 					// start values
 					scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
 					space = getScaleWidth(ctx, 0, mathHelperService.roundToNdigitsAfterDecPoint(0 / fileService.audioBuffer.sampleRate, 6), scaleX);
@@ -637,11 +638,100 @@ angular.module('testApp')
 						space = getScaleWidth(ctx, str1, str2, scaleX);
 						//fontScaleService.drawUndistortedTextTwoLines(ctx, str1, str2, fontSize, ConfigProviderService.design.font.small.family, posS + (posE - posS) / 2 - space / 2, 0, '#000000', false);
 					}
-				}
+				}*/
 
 			}
 
 		};
+
+		/**
+		 * drawing method to drawCrossHairs
+		 */
+		//Not used curently ?
+		/*sServObj.drawCrossHairs = function (ctx, mouseEvt, min, max, unit, trackname) {
+			// console.log(mathHelperService.roundToNdigitsAfterDecPoint(min, round))
+			if (ConfigProviderService.vals.restrictions.drawCrossHairs) {
+
+				var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
+				// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				ctx.strokeStyle = ConfigProviderService.design.color.transparent.red;
+				ctx.fillStyle = ConfigProviderService.design.color.transparent.red;
+
+				// see if Chrome -> dashed line
+				//if (navigator.vendor === 'Google Inc.') {
+				//	ctx.setLineDash([2]);
+				//}
+
+				// draw lines
+				var mouseX = viewState.getX(mouseEvt);
+				var mouseY = viewState.getY(mouseEvt);
+
+				//if (navigator.vendor === 'Google Inc.') {
+				//	ctx.setLineDash([0]);
+				//}
+
+				// draw frequency / sample / time
+				ctx.font = (ConfigProviderService.design.font.small.size + 'px ' + ConfigProviderService.design.font.small.family);
+				var mouseFreq = mathHelperService.roundToNdigitsAfterDecPoint(max - mouseY / ctx.canvas.height * max, 2); // SIC only uses max
+				var tW = ctx.measureText(mouseFreq + unit).width * fontScaleService.scaleX;
+				var tH = fontSize * fontScaleService.scaleY;
+				var s1 = Math.round(viewState.curViewPort.sS + mouseX / ctx.canvas.width * (viewState.curViewPort.eS - viewState.curViewPort.sS));
+				var s2 = mathHelperService.roundToNdigitsAfterDecPoint(viewState.getViewPortStartTime() + mouseX / ctx.canvas.width * (viewState.getViewPortEndTime() - viewState.getViewPortStartTime()), 6);
+
+                var y;
+                if(mouseY + tH < ctx.canvas.height){
+                    y = mouseY + 5;
+                }else{
+                    y = mouseY - tH - 5;
+                }
+
+				if (max !== undefined || min !== undefined) {
+					if (trackname === 'OSCI') {
+						// no horizontal values
+						ctx.beginPath();
+						//ctx.moveTo(0, mouseY);
+						//ctx.lineTo(5, mouseY + 5);
+						//ctx.moveTo(0, mouseY);
+						//ctx.lineTo(ctx.canvas.width, mouseY);
+						//ctx.lineTo(ctx.canvas.width - 5, mouseY + 5);
+						ctx.moveTo(mouseX, 0);
+						ctx.lineTo(mouseX, ctx.canvas.height);
+						ctx.stroke();
+					} else if (trackname === 'SPEC') {
+                        fontScaleService.drawUndistortedText(ctx, mouseFreq + unit, fontSize, ConfigProviderService.design.font.small.family, 5, y, ConfigProviderService.design.color.transparent.red, true);
+                        fontScaleService.drawUndistortedText(ctx, mouseFreq + unit, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - tW, y, ConfigProviderService.design.color.transparent.red, true);
+
+                        ctx.beginPath();
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(5, mouseY + 5);
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(ctx.canvas.width, mouseY);
+						ctx.lineTo(ctx.canvas.width - 5, mouseY + 5);
+						ctx.moveTo(mouseX, 0);
+						ctx.lineTo(mouseX, ctx.canvas.height);
+						ctx.stroke();
+					} else {
+						// draw min max an name of track
+						var tr = ConfigProviderService.getSsffTrackConfig(trackname);
+						var col = Ssffdataservice.getColumnOfTrack(tr.name, tr.columnName);
+						mouseFreq = col._maxVal - (mouseY / ctx.canvas.height * (col._maxVal - col._minVal));
+						mouseFreq = mathHelperService.roundToNdigitsAfterDecPoint(mouseFreq, 2); // crop
+						fontScaleService.drawUndistortedText(ctx, mouseFreq, fontSize, ConfigProviderService.design.font.small.family, 5, y, ConfigProviderService.design.color.transparent.red, true);
+						fontScaleService.drawUndistortedText(ctx, mouseFreq, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - 5 - tW, y, ConfigProviderService.design.color.transparent.red, true);
+						ctx.beginPath();
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(5, mouseY + 5);
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(ctx.canvas.width, mouseY);
+						ctx.lineTo(ctx.canvas.width - 5, mouseY + 5);
+						ctx.moveTo(mouseX, 0);
+						ctx.lineTo(mouseX, ctx.canvas.height);
+						ctx.stroke();
+					}
+				}
+				fontScaleService.drawUndistortedTextTwoLines(ctx, s1, s2, fontSize, ConfigProviderService.design.font.small.family, mouseX + 5, 0, ConfigProviderService.design.color.transparent.red, true);
+			}
+		};*/
 
 
         /**
@@ -649,19 +739,20 @@ angular.module('testApp')
 		 * this is used to draw a red line at the current mouse position
 		 * on canvases where the mouse is currently not hovering over
          */
-        sServObj.drawCrossHairX = function(ctx, mouseX){
+        /*sServObj.drawCrossHairX = function(ctx, mouseX){
             ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
             ctx.fillStyle = 'rgba(255, 0, 0, 0.5';
             ctx.beginPath();
             ctx.moveTo(mouseX, 0);
             ctx.lineTo(mouseX, ctx.canvas.height);
             ctx.stroke();
-        };
+        };*/
 
 		/**
 		 *
 		 */
-		sServObj.drawViewPortTimes = function (ctx) {
+		 //not used
+		/*sServObj.drawViewPortTimes = function (ctx) {
 			ctx.strokeStyle = "#000000";
 			ctx.fillStyle = "#000000";
 			//ctx.font = (ConfigProviderService.design.font.small.size + ' ' + ConfigProviderService.design.font.small.family);
@@ -682,12 +773,12 @@ angular.module('testApp')
 			var space;
 			if (viewState.curViewPort) {
 				//draw time and sample nr
-				sTime = mathHelperService.roundToNdigitsAfterDecPoint(0 / fileService.audioBuffer.sampleRate, 6);
-				eTime = mathHelperService.roundToNdigitsAfterDecPoint(fileService.audioBuffer.length / fileService.audioBuffer.sampleRate, 6);
-				//fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.sS, sTime, fontSize, ConfigProviderService.design.font.small.family, 5, 0, ConfigProviderService.design.color.black, true);
-				space = getScaleWidth(ctx, fileService.audioBuffer.length, eTime, scaleX);
-				//fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.eS, eTime, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - space - 5, 0, ConfigProviderService.design.color.black, false);
+				sTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.sS  / fileService.audioBuffer.sampleRate, 6);
+				eTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.eS / fileService.audioBuffer.sampleRate, 6);
+				fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.sS, sTime, fontSize, ConfigProviderService.design.font.small.family, 5, 0, ConfigProviderService.design.color.black, true);
+				space = getScaleWidth(ctx, viewState.curViewPort.eS, eTime, scaleX);
+				fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.eS, eTime, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - space - 5, 0, ConfigProviderService.design.color.black, false);
 			}
-		};
+		};*/
 		return sServObj;
 	});
