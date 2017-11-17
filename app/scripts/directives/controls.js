@@ -33,19 +33,12 @@ angular.module('testApp')
 				};		
 
 				scope.play = function(){
-					console.log("play");
 					//if audioBuffer !== undefined
 					//play it
 					if(fileService.getAudioBuffer()!==undefined){
 						playService.playFromTo(0,fileService.getAudioBuffer().length);
 					}
 				};
-
-				scope.stop = function(){
-					if(fileService.getAudioBuffer()!==undefined){
-						playService.stopPlaying();
-					}
-				}
 
 				scope.pauseResume = function(){
 					if(fileService.getAudioBuffer()!==undefined){

@@ -18,23 +18,28 @@ angular.module('testApp')
 
 		sServObj.playFromTo = function (sampleStart, endSample) {
 			//var cutWavBuff = this.extractRelPartOfWav(sampleStart, endSample);
+			if (typeof(audioContext) === 'undefined') {
+				initAudioContext();
+			}
 			if (sServObj.isPlaying) {
 				sServObj.isPlaying = false;
 				curSource.stop(0);
-			} else {
-
-				sServObj.isPlaying = true;
+			} else if(typeof(curSource) === 'undefined'){
 				if (fileService.getAudioBuffer().length > 0) { // if wav file is not empty
+					sServObj.isPlaying = true;
 					sServObj.decodeAndPlay(sampleStart, endSample);
 				}
+			} else if(audioContext.state=="suspended"){
+				sServObj.isPlaying = true;
+				audioContext.resume();
+			} else {
+				sServObj.isPlaying = true;
+				sServObj.decodeAndPlay(sampleStart,endSample);
 			}
 
 		};
 
 		sServObj.decodeAndPlay = function (sampleStart, endSample) {
-			if (typeof(audioContext) === 'undefined') {
-				initAudioContext();
-			}
 			var audioBuffer = fileService.getAudioBuffer();
 			if(audioBuffer !== undefined){
 					var startTime = sampleStart / audioBuffer.sampleRate;
@@ -51,29 +56,17 @@ angular.module('testApp')
 		
 		};
 
-		//Not working
-		sServObj.stopPlaying = function (){
-			if(sServObj.isPlaying){
-				curSource.stop();
-				sServObj.isPlaying = false;			
-			} else if(audioContext.state=="suspended"){
-				audioContext.resume();
-				curSource.stop();
-				sServObj.isPlaying = false;
-			}
-		}
-
 		sServObj.pauseResume = function() {
-			if(sServObj.isPlaying){
-				sServObj.isPlaying = false;
-				audioContext.suspend();
-			} else if(audioContext.state=="suspended"){
-				sServObj.isPlaying = true;
-				audioContext.resume();
-			} else {
-
+			if (typeof(audioContext) !== 'undefined') {
+				if(sServObj.isPlaying){
+					sServObj.isPlaying = false;
+					audioContext.suspend();
+				} else if(audioContext.state=="suspended"){
+					sServObj.isPlaying = true;
+					audioContext.resume();
+				}
 			}
-		}
+		};
 
 
 		return sServObj;
