@@ -15,10 +15,8 @@ angular.module('testApp')
 				scope.fs = fileService;
 				scope.dhs = Drawhelperservice;
 				// select the needed DOM elements from the template
-				scope.canvas = document.getElementById("spectro-1");
+				scope.canvas = document.getElementById("spectro");
 				scope.context = scope.canvas.getContext('2d');
-				scope.canvas2 = document.getElementById("spectro-2"); //useless canvas for now -- to be removed
-				scope.context2 = scope.canvas2.getContext('2d');
 
 				// FFT default vars
 				// default alpha for Window Function
@@ -48,7 +46,7 @@ angular.module('testApp')
 				// bindings
 
 				scope.redraw = function () {
-					scope.context2.clearRect(0, 0, scope.canvas2.width, scope.canvas2.height);
+					scope.context.clearRect(0, 0, scope.canvas.width, scope.canvas.height);
 					//change getChannelData here if multiple channel
 					scope.drawSpectro(scope.fs.audioBuffer.getChannelData(0));
 				};
@@ -62,29 +60,12 @@ angular.module('testApp')
 					return (scope.stop + 1 - scope.start) / scope.canvas.width;
 				};
 
-				scope.clearAndDrawSpectMarkup = function () {
-					scope.context.clearRect(0, 0, scope.canvas2.width, scope.canvas2.height);
-					scope.drawSpectMarkup();
-				};
-
-				scope.drawSpectMarkup = function () {
-					// draw moving boundary line if moving
-					//Drawhelperservice.drawMovingBoundaryLine(scope.context);
-					// draw current viewport selected
-					Drawhelperservice.drawCurViewPortSelected(scope.context2, false);
-					// draw min max vals and name of track
-					//Drawhelperservice.drawMinMaxAndName(scope.context, '', scope.vs.spectroSettings.rangeFrom, scope.vs.spectroSettings.rangeTo, 2);
-					Drawhelperservice.drawMinMaxAndName(scope.context2, '', 0, 5000, 2); //0 - 5000 are the default settings
-                    // only draw corsshair x line if mouse currently not over canvas
-					//Drawhelperservice.drawCrossHairX(scope.context, 0);
-
-                };
 
 				scope.killSpectroRenderingThread = function () {
 					scope.context.fillStyle = "#E7E7E7";
 					scope.context.fillRect(0, 0, scope.canvas.width, scope.canvas.height);
 					// draw current viewport selected
-					scope.dhs.drawCurViewPortSelected(scope.context2, false);
+					//scope.dhs.drawCurViewPortSelected(scope.context2, false);
 					//fontScaleService.drawUndistortedText(scope.context, 'rendering...', ConfigProviderService.design.font.small.size.slice(0, -2) * 0.75, ConfigProviderService.design.font.small.family, 10, 50, ConfigProviderService.design.color.black, true);
 					if (scope.primeWorker !== null) {
 						scope.primeWorker.kill();
@@ -100,7 +81,6 @@ angular.module('testApp')
 								var tmp = new Uint8ClampedArray(event.img);
 								imageData.data.set(tmp);
 								scope.context.putImageData(imageData, 0, 0);
-								scope.drawSpectMarkup();
 							}
 						} else {
 							console.error('Error rendering spectrogram:', event.status.message);
