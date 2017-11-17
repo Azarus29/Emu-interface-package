@@ -1,11 +1,15 @@
 'use strict';
 
+
+/**
+* Service that contains the audioBuffer 
+*/
 angular.module('testApp')
 	.service('fileService', function fileService($rootScope,Wavparserservice,browserDetector) {
 		// shared service object
 		var sServObj = {};
 		sServObj.file = undefined;
-		sServObj.audioBuffer = null;
+		sServObj.audioBuffer = undefined;
 
 		/**
 		* return false if there is no file yet
@@ -41,7 +45,7 @@ angular.module('testApp')
 					var tampon = sServObj.ArrayBufferToBASE64(res);
 					//converts BASE64 to arrayBuffer
 					tampon = sServObj.BASE64ToArrayBuffer(tampon);
-					//converts arrayBuffer to audioBuffer, which "starts" the app
+					//converts arrayBuffer to audioBuffer
 					Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
 						sServObj.setAudioBuffer(audioBuffer);
 					}, function (errMess){
