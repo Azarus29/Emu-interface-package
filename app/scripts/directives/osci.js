@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+* Add an osci of the signal of the fileService
+*/
 angular.module('testApp')
 	.directive('osci', function (Drawhelperservice, fileService) {
 		return {
@@ -23,7 +26,7 @@ angular.module('testApp')
 						scope.stop = scope.fs.getAudioBuffer().length;
 						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
 					}
-				}, true);
+				});
 			}
 		};
 	});

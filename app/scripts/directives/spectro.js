@@ -1,5 +1,9 @@
 'use strict';
 
+
+/**
+* Add a spectrogramm of the signal of the fileService
+*/
 angular.module('testApp')
 	.directive('spectro', function (Drawhelperservice, fileService, mathHelperService) {
 		return {
@@ -13,7 +17,7 @@ angular.module('testApp')
 				// select the needed DOM elements from the template
 				scope.canvas = document.getElementById("spectro-1");
 				scope.context = scope.canvas.getContext('2d');
-				scope.canvas2 = document.getElementById("spectro-2");
+				scope.canvas2 = document.getElementById("spectro-2"); //useless canvas for now -- to be removed
 				scope.context2 = scope.canvas2.getContext('2d');
 
 				// FFT default vars
@@ -38,7 +42,7 @@ angular.module('testApp')
 						scope.stop = scope.fs.getAudioBuffer().length;
 						scope.redraw();
 					}
-				},true);
+				});
 
 				///////////////
 				// bindings
@@ -55,12 +59,11 @@ angular.module('testApp')
 				};
 
 				scope.calcSamplesPerPxl = function () {
-					return (scope.stop + 1 - scope.start) / scope.canvas2.width;
-					//return (0 + 1 - scope.fs.audioBuffer.length) / canvas.width;
+					return (scope.stop + 1 - scope.start) / scope.canvas.width;
 				};
 
 				scope.clearAndDrawSpectMarkup = function () {
-					scope.context.clearRect(0, 0, scope.canvas1.width, scope.canvas1.height);
+					scope.context.clearRect(0, 0, scope.canvas2.width, scope.canvas2.height);
 					scope.drawSpectMarkup();
 				};
 
