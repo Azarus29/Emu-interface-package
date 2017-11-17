@@ -53,17 +53,25 @@ angular.module('testApp')
 
 		//Not working
 		sServObj.stopPlaying = function (){
-			curSource.stop();
-			sServObj.isPlaying = false;
+			if(sServObj.isPlaying){
+				curSource.stop();
+				sServObj.isPlaying = false;			
+			} else if(audioContext.state=="suspended"){
+				audioContext.resume();
+				curSource.stop();
+				sServObj.isPlaying = false;
+			}
 		}
 
 		sServObj.pauseResume = function() {
 			if(sServObj.isPlaying){
 				sServObj.isPlaying = false;
 				audioContext.suspend();
-			} else {
+			} else if(audioContext.state=="suspended"){
 				sServObj.isPlaying = true;
 				audioContext.resume();
+			} else {
+
 			}
 		}
 
