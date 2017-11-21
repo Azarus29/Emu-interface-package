@@ -5,7 +5,7 @@
 * Add a spectrogramm of the signal of the fileService
 */
 angular.module('testApp')
-	.directive('spectro', function (Drawhelperservice, fileService, mathHelperService) {
+	.directive('spectro', function (Drawhelperservice, fileService, mathHelperService, appStateService) {
 		return {
 			templateUrl: 'views/spectro.html',
 			restrict: 'E',
@@ -13,6 +13,7 @@ angular.module('testApp')
 			scope: {},
 			link: function postLink(scope, element) {
 				scope.fs = fileService;
+				scope.ass = appStateService;
 				scope.dhs = Drawhelperservice;
 				// select the needed DOM elements from the template
 				scope.canvas = document.getElementById("spectro");
@@ -41,6 +42,25 @@ angular.module('testApp')
 						scope.redraw();
 					}
 				});
+
+				scope.$watch('ass.getStart()',function(newValue, oldValue){
+					if (oldValue!==newValue) {
+						scope.start = scope.ass.getStart();
+						scope.stop = scope.ass.getStop();
+						scope.redraw();
+					}
+				});
+
+				scope.$watch('ass.getStop()',function(newValue, oldValue){
+					if (oldValue!==newValue) {
+						scope.start = scope.ass.getStart();
+						scope.stop = scope.ass.getStop();
+						scope.redraw();
+					}
+				});
+
+				//add watch to listen on appStateService
+				
 
 				///////////////
 				// bindings

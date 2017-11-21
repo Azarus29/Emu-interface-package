@@ -4,7 +4,7 @@
 * Add an osci of the signal of the fileService
 */
 angular.module('testApp')
-	.directive('osci', function (Drawhelperservice, fileService) {
+	.directive('osci', function (Drawhelperservice, fileService, appStateService) {
 		return {
 			templateUrl: 'views/osci.html',
 			restrict: 'E',
@@ -13,6 +13,7 @@ angular.module('testApp')
 			link: function postLink(scope, element) {
 				var canvas = document.getElementById("osci");
 				scope.fs = fileService;
+				scope.ass = appStateService;
 
 				
 				scope.start = undefined; 
@@ -27,6 +28,24 @@ angular.module('testApp')
 						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
 					}
 				});
+
+				scope.$watch('ass.getStart()',function(newValue, oldValue){
+					if (oldValue!==newValue) {
+						scope.start = scope.ass.getStart();
+						scope.stop = scope.ass.getStop();
+						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
+					}
+				});
+
+				scope.$watch('ass.getStop()',function(newValue, oldValue){
+					if (oldValue!==newValue) {
+						scope.start = scope.ass.getStart();
+						scope.stop = scope.ass.getStop();
+						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
+					}
+				});
+
+				//add watch to listen on appStateService
 			}
 		};
 	});

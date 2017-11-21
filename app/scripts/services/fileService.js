@@ -5,7 +5,7 @@
 * Service that contains the audioBuffer 
 */
 angular.module('testApp')
-	.service('fileService', function fileService($rootScope,Wavparserservice,browserDetector) {
+	.service('fileService', function fileService($rootScope,Wavparserservice,browserDetector,appStateService) {
 		// shared service object
 		var sServObj = {};
 		sServObj.file = undefined;
@@ -48,6 +48,8 @@ angular.module('testApp')
 					//converts arrayBuffer to audioBuffer
 					Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
 						sServObj.setAudioBuffer(audioBuffer);
+						appStateService.setMinMax(0,audioBuffer.length);
+						appStateService.setStartStop(0,audioBuffer.length);
 					}, function (errMess){
 						console.log("Erreur " + errMess);						
 					});
@@ -67,7 +69,6 @@ angular.module('testApp')
 				binary += String.fromCharCode(bytes[i]);
 			}
 			var res = window.btoa(binary);
-			console.log(res);
 			return res;
 		}
 
@@ -82,7 +83,6 @@ angular.module('testApp')
 				var ascii = binaryString.charCodeAt(i);
 				bytes[i] = ascii;
 			}
-			console.log(bytes.buffer);
 			return bytes.buffer;
 		};
 
