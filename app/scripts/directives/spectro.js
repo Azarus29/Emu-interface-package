@@ -36,7 +36,7 @@ angular.module('testApp')
 
 				//
 				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
-					if (oldValue!==newValue) {
+					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = 0;
 						scope.stop = scope.fs.getAudioBuffer().length;
 						scope.redraw();
@@ -44,7 +44,7 @@ angular.module('testApp')
 				});
 
 				scope.$watch('ass.getStart()',function(newValue, oldValue){
-					if (oldValue!==newValue) {
+					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = scope.ass.getStart();
 						scope.stop = scope.ass.getStop();
 						scope.redraw();
@@ -52,7 +52,7 @@ angular.module('testApp')
 				});
 
 				scope.$watch('ass.getStop()',function(newValue, oldValue){
-					if (oldValue!==newValue) {
+					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = scope.ass.getStart();
 						scope.stop = scope.ass.getStop();
 						scope.redraw();
