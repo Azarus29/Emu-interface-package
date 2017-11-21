@@ -118,7 +118,7 @@ angular.module('testApp')
 							fftN = 512;
 						}
 						// extract relavant data
-						parseData = buffer.subarray(0, scope.fs.audioBuffer.length);
+						parseData = buffer.subarray(scope.start, scope.stop);
 
 						var leftPadding = [];
 						var rightPadding = [];
