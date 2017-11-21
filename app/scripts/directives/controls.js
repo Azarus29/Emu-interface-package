@@ -9,7 +9,6 @@ angular.module('testApp')
 			link: function postLink(scope,element){
 
 				scope.zoomIn = function(){
-					console.log("zoomIn");
 					//if start / stop !== undefined
 					//then change them (stop/2)
 					if((appStateService.getStart()!==undefined)&&(appStateService.getStop()!==undefined)){
@@ -20,7 +19,6 @@ angular.module('testApp')
 				};
 
 				scope.zoomOut = function(){
-					console.log("zoomOut");
 					//if start / stop !== undefined
 					//change them (start-stop / 2)
 					if((appStateService.getStart!==undefined)&&(appStateService.getStop!==undefined)){
@@ -32,7 +30,6 @@ angular.module('testApp')
 				};
 
 				scope.toLeft = function(){
-					console.log("toLeft");
 					//if start / stop !== undefined
 					//change them  (start/stop -x if start > min);
 					if((appStateService.getStart!==undefined)&&(appStateService.getStop!==undefined)){
@@ -49,7 +46,6 @@ angular.module('testApp')
 				};
 
 				scope.toRight = function(){
-					console.log("toRight");
 					//if start / stop !== undefined
 					//change them (start/stop + x if stop < max)
 					if((appStateService.getStart!==undefined)&&(appStateService.getStop!==undefined)){

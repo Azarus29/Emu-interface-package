@@ -19,7 +19,6 @@ angular.module('testApp')
 			}
 			sServObj.startSignal = newStart;
 			sServObj.stopSignal = newStop;
-			console.log(newStart+" "+newStop);
 		}
 
 		sServObj.setMinMax = function(newMin,newMax){
