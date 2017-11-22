@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+* Helper from drawing in a canvas
+* @from EMU-app
+*/
 angular.module('testApp')
 	.service('Drawhelperservice', function Drawhelperservice(fileService, mathHelperService) {
 

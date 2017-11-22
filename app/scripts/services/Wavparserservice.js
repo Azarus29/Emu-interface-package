@@ -1,5 +1,10 @@
 'use strict';
 
+
+/**
+* Service to parse audioBuffer 
+* @from EMU-app
+*/
 angular.module('testApp')
 	.service('Wavparserservice', function Wavparserservice($q) {
 		// shared service object

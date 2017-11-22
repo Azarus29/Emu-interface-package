@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+* Service to detect the browser used by the user
+* @from EMU-app
+*/
 angular.module('testApp')
 	.factory('browserDetector', function () {
 

@@ -34,7 +34,7 @@ angular.module('testApp')
 				///////////////
 				// watches
 
-				//
+				//watching when the audio signal is available
 				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
 					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = 0;
@@ -43,6 +43,7 @@ angular.module('testApp')
 					}
 				});
 
+				//watching when zooming or shifting
 				scope.$watch('ass.getStart()',function(newValue, oldValue){
 					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = scope.ass.getStart();

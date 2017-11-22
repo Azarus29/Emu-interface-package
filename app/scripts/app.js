@@ -32,4 +32,6 @@ angular
       .otherwise({
         redirectTo: '/'
       });
-  });
+  }).config(['$locationProvider', function($locationProvider) {
+      $locationProvider.hashPrefix(''); //removing the '!' which makes the routing not working
+  }]);

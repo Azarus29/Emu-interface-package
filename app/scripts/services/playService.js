@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+* Plays the audio signal in an audio context
+*/
 angular.module('testApp')
 	.factory('playService', function (fileService) {
 		var curSource;
@@ -7,6 +10,7 @@ angular.module('testApp')
 		var audioContext;
 		sServObj.isPlaying = false;
 
+		//initiation of an audio context (HTML5)
 		function initAudioContext() {
 			try {
 				window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -16,6 +20,7 @@ angular.module('testApp')
 			}
 		};
 
+		//Play the signal from sampleStart to endSample - stop if already playing
 		sServObj.playFromTo = function (sampleStart, endSample) {
 			//var cutWavBuff = this.extractRelPartOfWav(sampleStart, endSample);
 			if (typeof(audioContext) === 'undefined') {
@@ -39,6 +44,7 @@ angular.module('testApp')
 
 		};
 
+		//Decode the signal and play it
 		sServObj.decodeAndPlay = function (sampleStart, endSample) {
 			var audioBuffer = fileService.getAudioBuffer();
 			if(audioBuffer !== undefined){
@@ -56,6 +62,7 @@ angular.module('testApp')
 		
 		};
 
+		//Pause the audio
 		sServObj.pauseResume = function() {
 			if (typeof(audioContext) !== 'undefined') {
 				if(sServObj.isPlaying){
