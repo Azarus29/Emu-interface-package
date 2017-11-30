@@ -3,8 +3,8 @@
 /**
 * Add an osci of the signal of the fileService
 */
-angular.module('testApp')
-	.directive('osci', function (Drawhelperservice, fileService, appStateService) {
+angular.module('EMUInterface')
+	.directive('osci', function (Drawhelperservice, bufferService, appStateService) {
 		return {
 			templateUrl: 'views/osci.html',
 			restrict: 'E',
@@ -12,7 +12,7 @@ angular.module('testApp')
 			scope: {},
 			link: function postLink(scope, element) {
 				var canvas = document.getElementById("osci");
-				scope.fs = fileService;
+				scope.bs = bufferService;
 				scope.ass = appStateService;
 
 				
@@ -24,7 +24,7 @@ angular.module('testApp')
 				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
 					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = 0;
-						scope.stop = scope.fs.getAudioBuffer().length;
+						scope.stop = scope.bs.getAudioBuffer().length;
 						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
 					}
 				});

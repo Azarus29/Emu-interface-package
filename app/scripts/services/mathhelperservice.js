@@ -7,7 +7,7 @@
  * # mathHelperService
  * Service in the emuwebApp.
  */
-angular.module('testApp')
+angular.module('EMUInterface')
 	.service('mathHelperService', function () {
 
 		//shared service object to be returned

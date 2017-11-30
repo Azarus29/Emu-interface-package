@@ -2,17 +2,17 @@
 
 
 /**
-* Add a spectrogramm of the signal of the fileService
+* Add a spectrogramm of the signal of the audio buffer
 */
-angular.module('testApp')
-	.directive('spectro', function (Drawhelperservice, fileService, mathHelperService, appStateService) {
+angular.module('EMUInterface')
+	.directive('spectro', function (Drawhelperservice, bufferService, mathHelperService, appStateService) {
 		return {
 			templateUrl: 'views/spectro.html',
 			restrict: 'E',
 			replace: true,
 			scope: {},
 			link: function postLink(scope, element) {
-				scope.fs = fileService;
+				scope.bs = bufferService;
 				scope.ass = appStateService;
 				scope.dhs = Drawhelperservice;
 				// select the needed DOM elements from the template
@@ -38,7 +38,7 @@ angular.module('testApp')
 				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
 					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = 0;
-						scope.stop = scope.fs.getAudioBuffer().length;
+						scope.stop = scope.bs.getAudioBuffer().length;
 						scope.redraw();
 					}
 				});
@@ -69,7 +69,7 @@ angular.module('testApp')
 				scope.redraw = function () {
 					scope.context.clearRect(0, 0, scope.canvas.width, scope.canvas.height);
 					//change getChannelData here if multiple channel
-					scope.drawSpectro(scope.fs.audioBuffer.getChannelData(0));
+					scope.drawSpectro(scope.bs.audioBuffer.getChannelData(0));
 				};
 
 				scope.drawSpectro = function (buffer) {
@@ -113,7 +113,7 @@ angular.module('testApp')
 					if (buffer.length > 0) {
 						scope.primeWorker = new SpectroDrawingWorker();
 						var parseData = [];
-						var fftN = mathHelperService.calcClosestPowerOf2Gt(scope.fs.audioBuffer.sampleRate * 0.01);
+						var fftN = mathHelperService.calcClosestPowerOf2Gt(scope.bs.audioBuffer.sampleRate * 0.01);
 						// fftN must be greater than 512 (leads to better resolution of spectrogram)
 						if (fftN < 512) {
 							fftN = 512;
@@ -125,7 +125,7 @@ angular.module('testApp')
 						var rightPadding = [];
 
 						// check if any zero padding at LEFT edge is necessary
-						var windowSizeInSamples = scope.fs.audioBuffer.length;
+						var windowSizeInSamples = scope.bs.audioBuffer.length;
 						if (0 < windowSizeInSamples / 2) {
 							//should do something here... currently always padding with zeros!
 						}
@@ -133,11 +133,11 @@ angular.module('testApp')
 							leftPadding = buffer.subarray(0 - windowSizeInSamples / 2, 0);
 						}
 						// check if zero padding at RIGHT edge is necessary
-						if (scope.fs.audioBuffer.length + fftN / 2 - 1 >= scope.fs.audioBuffer.length) {
+						if (scope.bs.audioBuffer.length + fftN / 2 - 1 >= scope.bs.audioBuffer.length) {
 							//should do something here... currently always padding with zeros!
 						}
 						else {
-							rightPadding = buffer.subarray(scope.fs.audioBuffer.length, scope.fs.audioBuffer.length + fftN / 2 - 1);
+							rightPadding = buffer.subarray(scope.bs.audioBuffer.length, scope.bs.audioBuffer.length + fftN / 2 - 1);
 						}
 						// add padding
 						var paddedSamples = new Float32Array(leftPadding.length + parseData.length + rightPadding.length);
@@ -147,10 +147,10 @@ angular.module('testApp')
 
 						/*if (0>= fftN / 2) {
 							// pass in half a window extra at the front and a full window extra at the back so everything can be drawn/calculated this also fixes alignment issue
-							parseData = buffer.subarray(0 - fftN / 2, scope.fs.audioBuffer.length + fftN);
+							parseData = buffer.subarray(0 - fftN / 2, scope.bs.audioBuffer.length + fftN);
 						} else {
 							// tolerate window/2 alignment issue if at beginning of file
-							parseData = buffer.subarray(0, scope.fs.audioBuffer.length+fftN);
+							parseData = buffer.subarray(0, scope.bs.audioBuffer.length+fftN);
 						}*/	
 						scope.setupEvent();
 						scope.primeWorker.tell({
@@ -165,7 +165,7 @@ angular.module('testApp')
 							'imgHeight': scope.canvas.height,
 							'dynRangeInDB': 70,
 							'pixelRatio': scope.devicePixelRatio,
-							'sampleRate': scope.fs.audioBuffer.sampleRate,
+							'sampleRate': scope.bs.audioBuffer.sampleRate,
 							'transparency': 255,
 							'audioBuffer': paddedSamples,
 							'audioBufferChannels': 1,

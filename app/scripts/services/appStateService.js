@@ -4,7 +4,7 @@
 /**
 * Contains the start and the end of the signal to display
 */
-angular.module('testApp')
+angular.module('EMUInterface')
 	.factory('appStateService', function ($rootScope) {
 		var sServObj = {};
 

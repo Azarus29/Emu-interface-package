@@ -7,8 +7,8 @@
  * # MainCtrl
  * Controller of the testApp
  */
-angular.module('testApp')
-  .controller('MainCtrl', function ($scope,$rootScope, fileService) {
+angular.module('EMUInterface')
+  .controller('MainCtrl', function ($scope,$rootScope, bufferService) {
 
 
   });

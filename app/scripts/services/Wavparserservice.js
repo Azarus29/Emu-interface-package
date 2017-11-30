@@ -5,7 +5,7 @@
 * Service to parse audioBuffer 
 * @from EMU-app
 */
-angular.module('testApp')
+angular.module('EMUInterface')
 	.service('Wavparserservice', function Wavparserservice($q) {
 		// shared service object
 		var sServObj = {};

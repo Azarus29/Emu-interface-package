@@ -3,11 +3,12 @@
 /**
 * Plays the audio signal in an audio context
 */
-angular.module('testApp')
-	.factory('playService', function (fileService) {
+angular.module('EMUInterface')
+	.factory('playService', function (bufferService) {
 		var curSource;
 		var sServObj = {};
 		var audioContext;
+		sServObj.bs = bufferService;
 		sServObj.isPlaying = false;
 
 		//initiation of an audio context (HTML5)
@@ -30,7 +31,7 @@ angular.module('testApp')
 				sServObj.isPlaying = false;
 				curSource.stop(0);
 			} else if(typeof(curSource) === 'undefined'){
-				if (fileService.getAudioBuffer().length > 0) { // if wav file is not empty
+				if (sServObj.bs.getAudioBuffer().length > 0) { // if wav file is not empty
 					sServObj.isPlaying = true;
 					sServObj.decodeAndPlay(sampleStart, endSample);
 				}
@@ -46,7 +47,7 @@ angular.module('testApp')
 
 		//Decode the signal and play it
 		sServObj.decodeAndPlay = function (sampleStart, endSample) {
-			var audioBuffer = fileService.getAudioBuffer();
+			var audioBuffer = sServObj.bs.getAudioBuffer();
 			if(audioBuffer !== undefined){
 					var startTime = sampleStart / audioBuffer.sampleRate;
 		            var endTime = endSample / audioBuffer.sampleRate;

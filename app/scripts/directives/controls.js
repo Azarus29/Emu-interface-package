@@ -1,12 +1,14 @@
 'use strict';
 
-angular.module('testApp')
-	.directive('controls', function (fileService,playService,appStateService) {
+angular.module('EMUInterface')
+	.directive('controls', function (bufferService,playService,appStateService) {
 		return {
 			templateUrl: 'views/controls.html',
 			restrict: 'E',
 			scope: {},
 			link: function postLink(scope,element){
+				scope.bs = bufferService;
+
 
 				scope.zoomIn = function(){
 					//if start / stop !== undefined
@@ -51,10 +53,10 @@ angular.module('testApp')
 					if((appStateService.getStart()!==undefined)&&(appStateService.getStop()!==undefined)){
 						var newStartS = appStateService.getStart() + ~~((appStateService.getStop() - appStateService.getStart()) / 4);
 						var newEndS = appStateService.getStop() + ~~((appStateService.getStop() - appStateService.getStart()) / 4);
-						if(newEndS<fileService.audioBuffer.length){
+						if(newEndS<scope.bs.audioBuffer.length){
 							appStateService.setStartStop(newStartS,newEndS);	
 						}else{
-							appStateService.setStartStop(appStateService.getStart()+(fileService.audioBuffer.length-appStateService.getStop()),fileService.audioBuffer.length);	//pas bon si déjà au bout
+							appStateService.setStartStop(appStateService.getStart()+(scope.bs.audioBuffer.length-appStateService.getStop()),scope.bs.audioBuffer.length);	//pas bon si déjà au bout
 						}
 					}
 				};		
@@ -62,13 +64,13 @@ angular.module('testApp')
 				scope.play = function(){
 					//if audioBuffer !== undefined
 					//play it
-					if(fileService.getAudioBuffer()!==undefined){
-						playService.playFromTo(0,fileService.getAudioBuffer().length);
+					if(scope.bs.getAudioBuffer()!==undefined){
+						playService.playFromTo(0,scope.bs.getAudioBuffer().length);
 					}
 				};
 
 				scope.pauseResume = function(){
-					if(fileService.getAudioBuffer()!==undefined){
+					if(scope.bs.getAudioBuffer()!==undefined){
 						playService.pauseResume();
 					}
 				}

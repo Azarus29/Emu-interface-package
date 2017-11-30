@@ -17,6 +17,8 @@ Run the following command in a terminal
 2. `bower install`
 3. `npm install`
 
-### Running the demonstration
+### Using the library
 
-run `$(npm bin)/grunt serve`. Normally a page should be open on the browser. If no default browser is configured open one brower at the following url: http://localhost:9000/
+In an `index.html`, add the attribute `ng-app="NAME"` to the body tag.
+Add a `<div ng-view=""></div>` to add the views according to the routes in the app.js
+

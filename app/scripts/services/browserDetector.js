@@ -4,7 +4,7 @@
 * Service to detect the browser used by the user
 * @from EMU-app
 */
-angular.module('testApp')
+angular.module('EMUInterface')
 	.factory('browserDetector', function () {
 
 		//shared service object to be returned
