@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{graphicx}
+\usepackage{moreverb}
 
 \title{EMU-Interface Documentation}
 \author{Pierre-Antoyne Fontaine}
@@ -22,7 +23,7 @@ The application is linked with a database containing files to display an audio s
 In a regular AngularJS application, the program is mainly divided into \textit{Services}, \textit{Directives} and \textit{Views}. The \textit{Services} contain datas and useful function, \textit{Directives} add specified behaviors in the \textit{Views}. The \textit{Views} display data.  \\
 
 In the EMU WebApp, \textit{Services} are used to manage data and providing useful functions for drawing the signals, annotations, etc. on canvas (sort of drawing area in HTML).
-\textit{Directives} add views in the main area, called by the \textit{Emuwebapp directive}. Then, most of the \textit{Directives} implement the \textit{\$watch()} method to update the views whenever datas are updated. This method is native to AngularJS, you can find more information on the official website of AngularJS (https://angularjs.org/). 
+\textit{Directives} add views in the main area, called by the \textit{Emuwebapp directive}. Then, most of the \textit{Directives} implement the \texttt{\$watch()} method to update the views whenever datas are updated. This method is native to AngularJS, you can find more information on the official website of AngularJS (\texttt{https://angularjs.org/}). 
 There is also a \textit{worker} called \textit{SpectroDrawingWorkerClass}, which allows the application to calculate the values for the spectrogram. \\
 
 The goal of the project is to extract all the \textit{Directives} and \textit{Services} useful for drawing the signal, its spectrogram and annotations linked with the speech data. 
@@ -34,7 +35,7 @@ The goal of the project is to extract all the \textit{Directives} and \textit{Se
 %  adapted and how you adapted them and finally what have you added
 %  - Explain also the dependencies, ....
 
-My package is also divided into \textit{Services} and \textit{Directives}. Once you get an \textit{audioBuffer} in the application (using the \textit{setAudioBuffer()} method of the \textit{bufferService}), the \textit{Directives} update their views and display the audio signal.
+My package is also divided into \textit{Services} and \textit{Directives}. Once you get an \textit{audioBuffer} in the application (using the \texttt{setAudioBuffer()} method of the \textit{bufferService}), the \textit{Directives} update their views and display the audio signal.
 
 The first version of the package extract the interface for displaying the audio signal and its spectrogram. For that, we needed to keep differents \textit{Services} :
 \begin{itemize}
@@ -78,8 +79,47 @@ I also add a \textit{Controls Directive} to zoom on the signal, but also to play
 %  you have to explain the use case of the POC to make the user understand what is the logic behind
 
 %First talk how to install the package
+To install the package, you have two solutions. The first solution is using the package as a regular AngularJS application. You need to have the \texttt{npm} and \texttt{bower} package installated. Then you need to run the following commands in a terminal :
+\begin{enumerate}
+\item \texttt{npm install grunt}
+\item \texttt{bower install}
+\item \texttt{npm install}
+\end{enumerate}
+Then you can run the application using \texttt{grunt serve}. Normally a page should be open on the browser. If no default browser is configured open one brower at the following url: \texttt{http://localhost:9000/}.
+
+The second solution is using the minified code. You need to add the JS scripts in an HTML file. Then you need to add the \texttt{ng-app="EMUInterface"} to the Body tag. Then you need to add a \texttt{<div ng-view=""></div>} to add the views directly in the HTML file. \\
+
 %Then talk how to access the audioBuffer
+To use the package, either using minified code or not, you will need to add a new javascript script. You will then need to call the functions in the \textit{bufferService}, using the following javascript code \texttt{angular.element(document.body)  .injector().get('bufferService')}, which gives you an instance of \textit{bufferService}.\\
+
 %Finally talk about how I used that to work with a .WAV file in entry of the application
+I implement the package in a small application which takes a .WAV file at the entrance of the application. The script is the following : 
+\begin{listing}[1]{1}
+var startDraw = function(){
+	var bufferService = angular.element(document.body).injector()
+	.get('bufferService');
+	var browserDetector = angular.element(document.body).injector()
+	.get('browserDetector');
+	var file = document.getElementById('fileEntry').files[0];
+	var reader = new FileReader();
+	var res; 
+
+	reader.readAsArrayBuffer(file);
+
+	reader.onloadend = function (evt) {
+		if (evt.target.readyState === FileReader.DONE) {
+			if (browserDetector.isBrowser.Firefox()) {
+				res = evt.target.result;
+			} else {
+				res = evt.currentTarget.result;
+			}
+			bufferService.setAudioBufferFromArray(res);
+		}
+	};
+};
+\end{listing}
+
+I add a file input in the HTML to call the \texttt{startDraw()} function when the user add a file. This function loads the file and add it in the \textit{BufferService} using the \texttt{setAudioBufferFromArray()} method. Then the application works as explained in the part 2.
 \section*{Conclusion}
 
 The next step to improve this project is to add the interface about annotations of a given speech to the package. This should work as the first part, using different functions to render the annotation on a canvas. 
