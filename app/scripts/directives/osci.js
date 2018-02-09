@@ -21,7 +21,7 @@ angular.module('EMUInterface')
 				
 
 				//watching when the audio signal is available
-				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
+				scope.$watch('bs.getAudioBuffer()', function(newValue, oldValue){
 					if ((newValue!==undefined)&&(oldValue!==newValue)) {
 						scope.start = 0;
 						scope.stop = scope.bs.getAudioBuffer().length;

@@ -14,6 +14,7 @@ angular.module('EMUInterface')
 
 		//sets the audioBuffer from an arrayBuffer (either gotten from a file or a Base64 using BASE64ToArrayBuffer())
 		sServObj.setAudioBufferFromArray = function(arrayBuffer){
+				console.log("test");
 				Wavparserservice.parseWavAudioBuf(arrayBuffer).then(function (audioBuffer) {
 					sServObj.setAudioBuffer(audioBuffer);
 					appStateService.setMinMax(0,audioBuffer.length);
