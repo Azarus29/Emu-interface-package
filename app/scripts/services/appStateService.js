@@ -44,6 +44,24 @@ angular.module('EMUInterface')
 			return sServObj.stopSignal;
 		}
 
+		/**
+		 * get pixel position in current viewport given the canvas width
+		 * @param w is width of canvas
+		 * @param s is current sample to convert to pixel value
+		 */
+		sServObj.getPos = function (w, s) {
+			return (w * (s - sServObj.startSignal) / (sServObj.stopSignal - sServObj.startSignal + 1)); // + 1 because of view (displays all samples in view)
+		};
+
+		/**
+		 * calculate the pixel distance between two samples
+		 * @param w is width of canvas
+		 */
+		sServObj.getSampleDist = function (w) {
+			return this.getPos(w, sServObj.startSignal + 1) - this.getPos(w, sServObj.startSignal);
+		};
+
+
 
 
 		return sServObj;

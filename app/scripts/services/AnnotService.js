@@ -35,7 +35,7 @@ angular.module('EMUInterface')
 		sServObj.convertTextGrid = function(sampleRate){
 			Textgridparserservice.asyncParseTextGrid(sServObj.textGrid, sampleRate, "annotTextGrid", "annotTextGrid").then(function (parseMess) {
 				sServObj.annot = parseMess;
-				//Something has changed, so we call $apply manually
+				//Something has changed, so we call $apply manually -- removed because of bugs
 				console.log(sServObj.annot);
 			}, function (errMess) {
 				console.log("error : "+errMess);
