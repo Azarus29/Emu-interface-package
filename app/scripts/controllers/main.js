@@ -8,11 +8,14 @@
  * Controller of the testApp
  */
 angular.module('EMUInterface')
-  .controller('MainCtrl', function ($scope,$rootScope, bufferService,annotService) {
+  .controller('MainCtrl', function ($scope,$rootScope, bufferService,AnnotService) {
+  	$scope.as = AnnotService;
 
-  	$scope.$watch('annotService.getAnnot()', function(newVal,oldVal){
+  	$scope.$watch('as.getAnnot()', function(newVal,oldVal){
   		if(newVal!==oldVal){
-  			//Ici ajouter les directives pour les levels - Extraire SEGMENTS et EVENT
+  			//Ici ajouter les directives pour les levels - Extraire SEGMENTS et EVENT et les rajouter dans levels
+  			console.log("New val is "+newVal);
+  			$scope.levels = newVal;
   		}
   	});
   });
