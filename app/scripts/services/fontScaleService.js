@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('emuwebApp')
+angular.module('EMUInterface')
 	.service('fontScaleService', function fontScaleService() {
 		// shared service object
 		var sServObj = {};

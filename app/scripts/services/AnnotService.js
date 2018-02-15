@@ -28,7 +28,7 @@ angular.module('EMUInterface')
 		* Sets the annotation
 		*/
 		sServObj.setAnnotFromJSON = function(text){
-			sServObj.annot = text;
+			sServObj.annot = JSON.parse(text);
 		};
 
 		//Used after putting the wav file
