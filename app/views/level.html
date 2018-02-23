@@ -1,6 +1,9 @@
 <div>
   <!-- Add the canvas here, one canvas for each "level" -->
   <div ng-repeat="level in levels"> 
-      <canvas id="osci" width="1024" height="128" style="width: 100%;"></canvas>
+  		<div style="width:100%; position: static;">
+			<canvas  width="2048" style="z-index: 1;" ></canvas>
+			<canvas  width="2048" style="z-index: 2; position: absolute;" ></canvas>
+      	</div>
   </div>
 </div>

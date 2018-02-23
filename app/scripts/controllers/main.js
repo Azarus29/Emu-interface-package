@@ -10,6 +10,13 @@
 angular.module('EMUInterface')
   .controller('MainCtrl', function ($scope,$rootScope, bufferService,AnnotService) {
   	$scope.as = AnnotService;
+    $scope.bs = bufferService;
+
+    $scope.$watch('bs.getAudioBuffer()', function(newVal,oldVal){
+            if(newVal!==oldVal){
+              $scope.levels = [];
+            }
+    });
 
 
   	$scope.$watch('as.getAnnot()', function(newVal,oldVal){
