@@ -22,22 +22,6 @@ angular.module('emuwebApp')
 					}
 				});
 
-				// bundleName needed to reset tr, col, sRaSt on bundle change
-				atts.$observe('bundleName', function (val) {
-					if (val) {
-						bundleName = val;
-						if (!$.isEmptyObject(Ssffdataservice.data)) {
-							if (Ssffdataservice.data.length !== 0) {
-								tr = ConfigProviderService.getSsffTrackConfig('FORMANTS');
-								if (tr !== undefined) {
-									col = Ssffdataservice.getColumnOfTrack(tr.name, tr.columnName);
-									sRaSt = Ssffdataservice.getSampleRateAndStartTimeOfTrack(tr.name);
-								}
-							}
-						}
-					}
-				});
-
 
 				/////////////////////////////
 				// Bindings

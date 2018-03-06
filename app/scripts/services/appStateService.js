@@ -58,7 +58,26 @@ angular.module('EMUInterface')
 			return sServObj.movingE;
 		}
 
+		/**
+		 *
+		 */
+		sServObj.getX = function (e) {
+			return (e.offsetX || e.originalEvent.layerX) * (e.originalEvent.target.width / e.originalEvent.target.clientWidth);
+		};
 
+		/**
+		 *
+		 */
+		sServObj.getY = function (e) {
+			return (e.offsetY || e.originalEvent.layerY) * (e.originalEvent.target.height / e.originalEvent.target.clientHeight);
+		};
+
+
+		sServObj.getSamplesPerPixelVal = function (event) {
+			var start = parseFloat(sServObj.startSignal);
+			var end = parseFloat(sServObj.stopSignal);
+			return (end - start) / event.originalEvent.target.width;
+		};
 
 		/**
 		 * get pixel position in current viewport given the canvas width

@@ -5,7 +5,7 @@
 * Add a spectrogramm of the signal of the audio buffer
 */
 angular.module('EMUInterface')
-	.directive('spectro', function (Drawhelperservice, bufferService, mathHelperService, appStateService) {
+	.directive('spectro', function (Drawhelperservice, bufferService, mathHelperService, appStateService, mouseService) {
 		return {
 			templateUrl: 'views/spectro.html',
 			restrict: 'E',
@@ -15,8 +15,10 @@ angular.module('EMUInterface')
 				scope.bs = bufferService;
 				scope.ass = appStateService;
 				scope.dhs = Drawhelperservice;
+				scope.ms = mouseService;
 				// select the needed DOM elements from the template
 				scope.canvas = document.getElementById("spectro");
+				scope.canvas2 = document.getElementById("spectro2");
 				scope.context = scope.canvas.getContext('2d');
 
 				// FFT default vars
@@ -60,8 +62,39 @@ angular.module('EMUInterface')
 					}
 				});
 
-				//add watch to listen on appStateService
-				
+				//Mouse bind -- Draw selected area
+				element.bind("mousedown", function(event){
+					scope.ms.setSelectedAreaS(scope.ass.getX(event));
+
+				});
+
+				element.bind("mouseup", function(event){
+					scope.ms.setSelectedAreaE(scope.ass.getX(event));
+					
+				});
+
+				//mousemove for red drawing line
+				element.bind("mousemove", function(event){
+					//draw red line at the position of the mouse - update the mouseX and mouseY from mouseService
+					if(event.buttons>0){ //if mouse button was clicked
+						scope.ms.setSelectedAreaE(scope.ass.getX(event));
+					}
+				});
+
+
+				//Watches for drawing the selected area
+				scope.$watch('ms.getSelectedAreaS()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						Drawhelperservice.drawSelectedArea(scope.canvas2);
+					}
+				});
+
+				scope.$watch('ms.getSelectedAreaE()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						Drawhelperservice.drawSelectedArea(scope.canvas2);
+					}
+				});
+
 
 				///////////////
 				// bindings
