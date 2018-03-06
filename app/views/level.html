@@ -1,6 +1,9 @@
 <div>
   <!-- Add the canvas here, one canvas for each "level" -->
   <div ng-repeat="level in levels"> 
-      <canvas id="osci" width="1024" height="128" style="width: 100%;"></canvas>
+  		<div id="{{level.name}}" class="levelContainer">
+			<canvas width="2048" class="canvas1" ></canvas>
+			<canvas width="2048" class="canvas2" ></canvas>
+      	</div>
   </div>
 </div>

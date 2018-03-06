@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('EMUInterface')
-	.directive('level', function ($timeout, $animate, bufferService, fontScaleService, AnnotService,appStateService) {
+	.directive('level', function ($timeout, $animate, bufferService, fontScaleService, AnnotService,appStateService,Drawhelperservice,mouseService) {
 		return {
 			templateUrl: 'views/level.html',
 			restrict: 'E',
@@ -18,8 +18,10 @@ angular.module('EMUInterface')
 				scope.bs = bufferService;
 				scope.anots = AnnotService;
 				scope.ass = appStateService;
+				scope.ms = mouseService;
 
-
+				var canvas = element.find('.canvas1');
+				var canvas2 = element.find('.canvas2');
 				var levelCanvasContainer = element.find('div');
 				scope.backgroundCanvas = {
 					'background': "#E7E7E7"
@@ -30,14 +32,16 @@ angular.module('EMUInterface')
 				///////////////
 				// watches
 
+				//watch for levels datas
 				scope.$watch('levels', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
 						scope.redraw();
+
 					}
 				});
 
 
-
+				//watches for zoom
 				scope.$watch('ass.getStart()', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
 						scope.redraw();
@@ -50,6 +54,77 @@ angular.module('EMUInterface')
 						scope.redraw();
 					}
 				});
+
+				//Watches for drawing the selected area
+				scope.$watch('ms.getSelectedAreaS()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
+					}
+				});
+
+				scope.$watch('ms.getSelectedAreaE()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						console.log("Test");
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
+					}
+				});
+
+				//ADD a structure which contains all the levels and check which one is clicked
+				//Check the position with viewState.getX(x) * viewState.getSamplesPerPixelVal(x)
+				//Check which event is the closest levels.items.foreach.samplestart + sampledur
+
+				element.bind("click", function(event){
+						var eltID = event.target.parentElement.id;
+						//level type - choose between only drawing line or a selected area
+						var clickSample = scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event);
+						scope.levels.forEach(function(level){
+							if(level.name === eltID){
+								console.log(level);
+								level.items.forEach(function(item){
+									if(level.type==="SEGMENT"){
+										if(clickSample >= item.sampleStart && clickSample < item.sampleStart + item.sampleDur){
+											scope.ms.setSelectedAreaS(item.sampleStart / scope.ass.getSamplesPerPixelVal(event));
+											scope.ms.setSelectedAreaE((item.sampleStart+item.sampleDur) / scope.ass.getSamplesPerPixelVal(event));
+										}
+									} else if (level.type==="EVENT"){
+										var spaceLower = 0;
+										var spaceHigher = 0;
+										level.items.forEach(function (evt, index) {
+											if (index < level.items.length - 1) {
+												spaceHigher = evt.samplePoint + (level.items[index + 1].samplePoint - level.items[index].samplePoint) / 2;
+											} else {
+												spaceHigher = scope.bs.getAudioBuffer().length;
+											}
+											if (index > 0) {
+												spaceLower = evt.samplePoint - (level.items[index].samplePoint - level.items[index - 1].samplePoint) / 2;
+											} else {
+												spaceLower = 0;
+											}
+											if (clickSample <= spaceHigher && clickSample >= spaceLower) {
+												scope.ms.setSelectedAreaS(evt.samplePoint / scope.ass.getSamplesPerPixelVal(event));
+												scope.ms.setSelectedAreaE(evt.samplePoint / scope.ass.getSamplesPerPixelVal(event));
+											}
+										});
+									}
+									
+								});
+							}
+						});
+				});
+
+				//mousemove for red drawing line
+				element.bind("mousemove", function(event){
+					//draw red line at the position of the mouse - update the mouseX and mouseY from mouseService - only draw vertical red line
+				});
+
+
+				//TODO Add marqueur to preselect levels + red lines
 
 				// //
 				// scope.$watch('vs.curViewPort', function (newValue, oldValue) {
@@ -173,10 +248,10 @@ angular.module('EMUInterface')
 				// });
 
 				/**
-				 * draw level details -- TODO find a way to draw multiples annotations
+				 * draw level details 
 				 */
 				scope.drawLevelDetails = function () {
-					var canvas = element.find('canvas');
+					canvas = element.find('.canvas1');
                     var labelFontFamily; // font family used for labels only
                     var fontFamily = "HelveticaNeue"; // found in EMU config
 
@@ -191,9 +266,10 @@ angular.module('EMUInterface')
 						scope.drawHierarchyDetails();
 					}*/
 					var i = 0;
+					//Drawing loop in the canvas
 					scope.levels.forEach(function(level){
 						var curAttrDef = level.name;
-						var ctx = canvas[i++].getContext('2d');
+						var ctx = canvas[i++].getContext('2d'); //There a total of level * 2 canvas, 2 for each canvas (one for details, one for markups)
 						ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 						ctx.fillStyle = "#E7E7E7";
 						ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -347,10 +423,10 @@ angular.module('EMUInterface')
 				/*scope.drawLevelMarkup = function () {
 					var ctx = canvas[1].getContext('2d');
 					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-					if (scope.level.name === scope.vs.getcurClickLevelName()) {
-						ctx.fillStyle = ConfigProviderService.design.color.transparent.grey;
-						ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-					}
+					// if (scope.level.name === scope.vs.getcurClickLevelName()) {
+					// 	ctx.fillStyle = ConfigProviderService.design.color.transparent.grey;
+					// 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+					// }
 
 					// draw moving boundary line if moving
 					Drawhelperservice.drawMovingBoundaryLine(ctx);
@@ -360,16 +436,16 @@ angular.module('EMUInterface')
 
 
 					var posS, posE, sDist, xOffset, item;
-					posS = scope.vs.getPos(ctx.canvas.width, scope.vs.curViewPort.selectS);
-					posE = scope.vs.getPos(ctx.canvas.width, scope.vs.curViewPort.selectE);
-					sDist = scope.vs.getSampleDist(ctx.canvas.width);
+					posS = scope.ass.getPos(ctx.canvas.width, scope.ass.getStart());
+					posE = scope.ass.getPos(ctx.canvas.width, scope.ass.getStop());
+					sDist = scope.ass.getSampleDist(ctx.canvas.width);
 
 
 					var segMId = scope.vs.getcurMouseItem();
 					var isFirst = scope.vs.getcurMouseisFirst();
 					var isLast = scope.vs.getcurMouseisLast();
 					var clickedSegs = scope.vs.getcurClickItems();
-					var levelId = scope.vs.getcurClickLevelName();
+					var levelId = scope.vs.getcurClickLevelName(); // TODO Fix those variables - ie create a mouse manager
 					if (clickedSegs !== undefined) {
 						// draw clicked on selected areas
 						if (scope.level.name === levelId && clickedSegs.length > 0) {
@@ -377,14 +453,14 @@ angular.module('EMUInterface')
 								if (cs !== undefined) {
 									// check if segment or event level
 									if (cs.sampleStart !== undefined) {
-										posS = Math.round(scope.vs.getPos(ctx.canvas.width, cs.sampleStart));
-										posE = Math.round(scope.vs.getPos(ctx.canvas.width, cs.sampleStart + cs.sampleDur + 1));
+										posS = Math.round(scope.ass.getPos(ctx.canvas.width, cs.sampleStart));
+										posE = Math.round(scope.ass.getPos(ctx.canvas.width, cs.sampleStart + cs.sampleDur + 1));
 									} else {
-										posS = Math.round(scope.vs.getPos(ctx.canvas.width, cs.samplePoint) + sDist / 2);
+										posS = Math.round(scope.ass.getPos(ctx.canvas.width, cs.samplePoint) + sDist / 2);
 										posS = posS - 5;
 										posE = posS + 10;
 									}
-									ctx.fillStyle = ConfigProviderService.design.color.transparent.yellow;
+									ctx.fillStyle = "rgba(255, 255, 22, 0.35)";
 									ctx.fillRect(posS, 0, posE - posS, ctx.canvas.height);
 									ctx.fillStyle = "#000";
 								}
@@ -426,41 +502,6 @@ angular.module('EMUInterface')
 
 					// draw cursor
 					Drawhelperservice.drawCrossHairX(ctx, viewState.curMouseX);
-				};*/
-
-				/**
-				 * draw level hierarchy -- FIXME : Remove the hls and path
-				 */
-				/*scope.drawHierarchyDetails = function () {
-					var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
-					var paths = scope.hls.findPaths(scope.level.name);
-					var curPath = paths[1];
-
-					var ctx = canvas[0].getContext('2d');
-					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-					//var mTxtImgWidth = ctx.measureText('m').width * fontScaleService.scaleX;
-
-					ctx.strokeStyle = "#000";
-
-					// find parents for every parent for every items hence building the annotation graph
-					scope.hls.findParents(curPath);
-
-					// draw ghost level
-					for(var i = 0; i < curPath.length; i++){
-						var curLevel = scope.ls.getLevelDetails(curPath[i]);
-						var levelHeight = ctx.canvas.height / curPath.length;
-						var curStartY = ctx.canvas.height - (i + 1) * levelHeight;
-						for(var itemIdx = 0; itemIdx < curLevel.items.length; itemIdx++){
-							var posS = Math.round(scope.vs.getPos(ctx.canvas.width, curLevel.items[itemIdx]._derivedSampleStart));
-							var posE = Math.round(scope.vs.getPos(ctx.canvas.width, curLevel.items[itemIdx]._derivedSampleEnd));
-							ctx.strokeRect(posS, curStartY , posE - posS, curStartY + levelHeight);
-
-							// draw label
-							fontScaleService.drawUndistortedText(ctx, curLevel.items[itemIdx].labels[0].value, fontSize - 2, ConfigProviderService.design.font.small.family, posS + (posE - posS) / 2 - ctx.measureText(curLevel.items[itemIdx].labels[0].value).width / 2 - 2, curStartY + levelHeight / 2, "#000", true);
-						}
-					}
-
 				};*/
 
 			}

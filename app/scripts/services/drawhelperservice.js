@@ -5,7 +5,7 @@
 * @from EMU-app
 */
 angular.module('EMUInterface')
-	.service('Drawhelperservice', function Drawhelperservice(bufferService, mathHelperService) {
+	.service('Drawhelperservice', function Drawhelperservice(bufferService, mathHelperService,mouseService) {
 
 		//shared service object to be returned
 		var sServObj = {};
@@ -264,6 +264,33 @@ angular.module('EMUInterface')
 			};
 		};
 
+		sServObj.drawSelectedArea = function(canvas) {
+					//Add the selected area
+					var ctx = canvas.getContext("2d");
+					ctx.clearRect(0,0,canvas.width,canvas.height);
+					if(mouseService.getSelectedAreaS()!==undefined&&mouseService.getSelectedAreaE()!==undefined){
+						//First line
+						ctx.fillStyle = "#000";
+						ctx.beginPath();
+            			ctx.moveTo(mouseService.getSelectedAreaS(), 0);
+            			ctx.lineTo(mouseService.getSelectedAreaS(), ctx.canvas.height);
+            			ctx.stroke();
+            			//Second line
+            			ctx.fillStyle = "#000";
+						ctx.beginPath();
+            			ctx.moveTo(mouseService.getSelectedAreaE(), 0);
+            			ctx.lineTo(mouseService.getSelectedAreaE(), ctx.canvas.height);
+            			ctx.stroke();
+            			//Rectangle
+            			ctx.fillStyle = "rgba(22,22,22,0.18)";
+            			if(mouseService.getSelectedAreaS()<mouseService.getSelectedAreaE()){
+            				ctx.fillRect(mouseService.getSelectedAreaS(), 0, mouseService.getSelectedAreaE()-mouseService.getSelectedAreaS(), canvas.height);
+            			} else {
+            				ctx.fillRect(mouseService.getSelectedAreaE(), 0, mouseService.getSelectedAreaS()-mouseService.getSelectedAreaE(), canvas.height);	
+            			}
+					}
+		};
+
 		sServObj.calcSampleTime = function (sample) {
 			return (sample / sServObj.bs.audioBuffer.sampleRate) + 0.5 / sServObj.bs.audioBuffer.sampleRate;
 		};
@@ -325,6 +352,8 @@ angular.module('EMUInterface')
 			// clear canvas
 			var ctx = canvas.getContext('2d');
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.strokeStyle = "#000";
+			ctx.fillStyle = "#000";
 
 			if(forceToCalcOsciPeaks){
 				sServObj.osciPeaks = {};
@@ -489,11 +518,9 @@ angular.module('EMUInterface')
 					}
 				}
 			}
-
-			/*if (ConfigProviderService.vals.restrictions.drawZeroLine) {
-				// draw zero line
-				ctx.strokeStyle = ConfigProviderService.design.color.blue;
-				ctx.fillStyle = ConfigProviderService.design.color.blue;
+			// draw zero line
+				ctx.strokeStyle = "#0DC5FF";
+				ctx.fillStyle = "#0DC5FF";
 
 				var zeroLineY;
 
@@ -513,7 +540,6 @@ angular.module('EMUInterface')
 					ctx.fill();
 					ctx.fillText('0', 5, canvas.height - ((0 - allPeakVals.minSample) / (allPeakVals.maxSample - allPeakVals.minSample) * canvas.height) - 5, canvas.width);
 				}
-			}*/
 		};
 
 

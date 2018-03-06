@@ -4,7 +4,7 @@
 * Add an osci of the signal of the fileService
 */
 angular.module('EMUInterface')
-	.directive('osci', function (Drawhelperservice, bufferService, appStateService) {
+	.directive('osci', function (Drawhelperservice, bufferService, appStateService,mouseService) {
 		return {
 			templateUrl: 'views/osci.html',
 			restrict: 'E',
@@ -12,12 +12,14 @@ angular.module('EMUInterface')
 			scope: {},
 			link: function postLink(scope, element) {
 				var canvas = document.getElementById("osci");
+				var canvas2 = document.getElementById("osci2");
 				scope.bs = bufferService;
 				scope.ass = appStateService;
-
+				scope.ms = mouseService;
 				
 				scope.start = undefined; 
 				scope.stop = undefined;
+
 				
 
 				//watching when the audio signal is available
@@ -43,6 +45,36 @@ angular.module('EMUInterface')
 						scope.start = scope.ass.getStart();
 						scope.stop = scope.ass.getStop();
 						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
+					}
+				});
+
+				//Watches for drawing the selected area
+				scope.$watch('ms.getSelectedAreaS()', function (newValue, oldValue) {
+					if ((newValue!==undefined)&&(oldValue!==newValue)) {
+						Drawhelperservice.drawSelectedArea(canvas2);
+					}
+				});
+
+				scope.$watch('ms.getSelectedAreaE()', function (newValue, oldValue) {
+					if ((newValue!==undefined)&&(oldValue!==newValue)) {
+						Drawhelperservice.drawSelectedArea(canvas2);
+					}
+				});
+
+				//Mouse bind -- Draw selected area
+				element.bind("mousedown", function(event){
+					scope.ms.setSelectedAreaS(scope.ass.getX(event));
+				});
+
+				element.bind("mouseup", function(event){
+					scope.ms.setSelectedAreaE(scope.ass.getX(event));
+				})
+
+				//mousemove for red drawing line
+				element.bind("mousemove", function(event){
+					//draw red line at the position of the mouse - update the mouseX and mouseY from mouseService
+					if(event.buttons>0){ //if mouse button was clicked
+						scope.ms.setSelectedAreaE(scope.ass.getX(event));
 					}
 				});
 
