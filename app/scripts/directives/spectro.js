@@ -51,6 +51,7 @@ angular.module('EMUInterface')
 						scope.start = scope.ass.getStart();
 						scope.stop = scope.ass.getStop();
 						scope.redraw();
+						Drawhelperservice.drawSelectedArea(scope.canvas2);
 					}
 				});
 
@@ -59,17 +60,18 @@ angular.module('EMUInterface')
 						scope.start = scope.ass.getStart();
 						scope.stop = scope.ass.getStop();
 						scope.redraw();
+						Drawhelperservice.drawSelectedArea(scope.canvas2);
 					}
 				});
 
 				//Mouse bind -- Draw selected area
 				element.bind("mousedown", function(event){
-					scope.ms.setSelectedAreaS(scope.ass.getX(event));
+					scope.ms.setSelectedAreaS( scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event));
 
 				});
 
 				element.bind("mouseup", function(event){
-					scope.ms.setSelectedAreaE(scope.ass.getX(event));
+					scope.ms.setSelectedAreaE( scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event));
 					
 				});
 
@@ -77,7 +79,7 @@ angular.module('EMUInterface')
 				element.bind("mousemove", function(event){
 					//draw red line at the position of the mouse - update the mouseX and mouseY from mouseService
 					if(event.buttons>0){ //if mouse button was clicked
-						scope.ms.setSelectedAreaE(scope.ass.getX(event));
+						scope.ms.setSelectedAreaE( scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event));
 					}
 				});
 

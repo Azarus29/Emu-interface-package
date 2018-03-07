@@ -36,7 +36,6 @@ angular.module('EMUInterface')
 				scope.$watch('levels', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
 						scope.redraw();
-
 					}
 				});
 
@@ -45,6 +44,10 @@ angular.module('EMUInterface')
 				scope.$watch('ass.getStart()', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
 						scope.redraw();
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
 					}
 				});
 
@@ -52,6 +55,10 @@ angular.module('EMUInterface')
 				scope.$watch('ass.getStop()', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
 						scope.redraw();
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
 					}
 				});
 
@@ -67,7 +74,6 @@ angular.module('EMUInterface')
 
 				scope.$watch('ms.getSelectedAreaE()', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
-						console.log("Test");
 						canvas2 = element.find('.canvas2');
 						for(var i = 0; i<canvas2.length; i++){
 							Drawhelperservice.drawSelectedArea(canvas2[i]);
@@ -82,15 +88,14 @@ angular.module('EMUInterface')
 				element.bind("click", function(event){
 						var eltID = event.target.parentElement.id;
 						//level type - choose between only drawing line or a selected area
-						var clickSample = scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event);
+						var clickSample = scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event);
 						scope.levels.forEach(function(level){
 							if(level.name === eltID){
-								console.log(level);
 								level.items.forEach(function(item){
 									if(level.type==="SEGMENT"){
 										if(clickSample >= item.sampleStart && clickSample < item.sampleStart + item.sampleDur){
-											scope.ms.setSelectedAreaS(item.sampleStart / scope.ass.getSamplesPerPixelVal(event));
-											scope.ms.setSelectedAreaE((item.sampleStart+item.sampleDur) / scope.ass.getSamplesPerPixelVal(event));
+											scope.ms.setSelectedAreaS(item.sampleStart);
+											scope.ms.setSelectedAreaE(item.sampleStart+item.sampleDur);
 										}
 									} else if (level.type==="EVENT"){
 										var spaceLower = 0;
@@ -107,10 +112,30 @@ angular.module('EMUInterface')
 												spaceLower = 0;
 											}
 											if (clickSample <= spaceHigher && clickSample >= spaceLower) {
-												scope.ms.setSelectedAreaS(evt.samplePoint / scope.ass.getSamplesPerPixelVal(event));
-												scope.ms.setSelectedAreaE(evt.samplePoint / scope.ass.getSamplesPerPixelVal(event));
+												scope.ms.setSelectedAreaS(evt.samplePoint);
+												scope.ms.setSelectedAreaE(evt.samplePoint);
 											}
 										});
+									}
+									
+								});
+							}
+						});
+				});
+
+				element.bind("dblclick",function(event){
+					var eltID = event.target.parentElement.id;
+						//level type - choose between only drawing line or a selected area
+						var clickSample = scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event);
+						scope.levels.forEach(function(level){
+							if(level.name === eltID){
+								level.items.forEach(function(item){
+									if(level.type==="SEGMENT"){
+										if(clickSample >= item.sampleStart && clickSample < item.sampleStart + item.sampleDur){
+											scope.ass.setStartStop(item.sampleStart,(item.sampleStart+item.sampleDur));
+											scope.ms.setSelectedAreaS(item.sampleStart);
+											scope.ms.setSelectedAreaE(item.sampleStart+item.sampleDur);
+										}
 									}
 									
 								});

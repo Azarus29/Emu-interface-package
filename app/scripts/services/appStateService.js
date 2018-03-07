@@ -12,7 +12,7 @@ angular.module('EMUInterface')
 		sServObj.startSignal = undefined;
 		sServObj.stopSignal = undefined;
 
-		//minimum and maximum length of the signal (usually 0 and audioBuffer.lenght)
+		//minimum and maximum length of the signal (usually 0 and audioBuffer.length)
 		sServObj.startMin = undefined;
 		sServObj.stopMax = undefined;
 
@@ -78,6 +78,12 @@ angular.module('EMUInterface')
 			var end = parseFloat(sServObj.stopSignal);
 			return (end - start) / event.originalEvent.target.width;
 		};
+
+		sServObj.getSamplesPerPixelValCanvas = function(canvas) {
+			var start = parseFloat(sServObj.startSignal);
+			var end = parseFloat(sServObj.stopSignal);
+			return (end - start) / canvas.width;
+		}
 
 		/**
 		 * get pixel position in current viewport given the canvas width

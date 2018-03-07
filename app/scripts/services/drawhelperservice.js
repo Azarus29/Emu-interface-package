@@ -5,7 +5,7 @@
 * @from EMU-app
 */
 angular.module('EMUInterface')
-	.service('Drawhelperservice', function Drawhelperservice(bufferService, mathHelperService,mouseService) {
+	.service('Drawhelperservice', function Drawhelperservice(bufferService, mathHelperService,mouseService,appStateService) {
 
 		//shared service object to be returned
 		var sServObj = {};
@@ -270,23 +270,26 @@ angular.module('EMUInterface')
 					ctx.clearRect(0,0,canvas.width,canvas.height);
 					if(mouseService.getSelectedAreaS()!==undefined&&mouseService.getSelectedAreaE()!==undefined){
 						//First line
+						var pixelStart = (mouseService.getSelectedAreaS() - appStateService.getStart()) / appStateService.getSamplesPerPixelValCanvas(canvas);
+						var pixelEnd = (mouseService.getSelectedAreaE() - appStateService.getStart()) / appStateService.getSamplesPerPixelValCanvas(canvas);
+						console.log(pixelStart+" "+pixelEnd);
 						ctx.fillStyle = "#000";
 						ctx.beginPath();
-            			ctx.moveTo(mouseService.getSelectedAreaS(), 0);
-            			ctx.lineTo(mouseService.getSelectedAreaS(), ctx.canvas.height);
+            			ctx.moveTo(pixelStart, 0);
+            			ctx.lineTo(pixelStart, ctx.canvas.height);
             			ctx.stroke();
             			//Second line
             			ctx.fillStyle = "#000";
 						ctx.beginPath();
-            			ctx.moveTo(mouseService.getSelectedAreaE(), 0);
-            			ctx.lineTo(mouseService.getSelectedAreaE(), ctx.canvas.height);
+            			ctx.moveTo(pixelEnd, 0);
+            			ctx.lineTo(pixelEnd, ctx.canvas.height);
             			ctx.stroke();
             			//Rectangle
             			ctx.fillStyle = "rgba(22,22,22,0.18)";
-            			if(mouseService.getSelectedAreaS()<mouseService.getSelectedAreaE()){
-            				ctx.fillRect(mouseService.getSelectedAreaS(), 0, mouseService.getSelectedAreaE()-mouseService.getSelectedAreaS(), canvas.height);
+            			if(pixelStart<pixelEnd){
+            				ctx.fillRect(pixelStart, 0, pixelEnd-pixelStart, canvas.height);
             			} else {
-            				ctx.fillRect(mouseService.getSelectedAreaE(), 0, mouseService.getSelectedAreaS()-mouseService.getSelectedAreaE(), canvas.height);	
+            				ctx.fillRect(pixelEnd, 0, pixelStart-pixelEnd, canvas.height);	
             			}
 					}
 		};
