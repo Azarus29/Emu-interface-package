@@ -36,7 +36,7 @@ angular.module('EMUInterface')
 			for (var i = 0; i < len; i++) {
 				binary += String.fromCharCode(bytes[i]);
 			}
-			var res = window.btoa(binary);
+			var res = window.btoa(buffer);
 			return res;
 		}
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('EMUInterface')
-	.directive('controls', function (bufferService,playService,appStateService) {
+	.directive('controls', function (bufferService,playService,appStateService,FileSaver,audioBufferToWav) {
 		return {
 			templateUrl: 'views/controls.html',
 			restrict: 'E',
@@ -74,6 +74,16 @@ angular.module('EMUInterface')
 						playService.pauseResume();
 					}
 				}
+
+				scope.download = function(){
+					if(scope.bs.getAudioBuffer()){
+						var wavBuffer = audioBufferToWav.audioBufferToWav(scope.bs.getAudioBuffer());
+						console.log(wavBuffer);
+						var data = new Blob([wavBuffer], { type: 'audio/wav' });
+    					FileSaver.saveAs(data, 'result.wav');
+					}
+				}
+
 			}
 		};
-	});
+	},['FileSaver']);
